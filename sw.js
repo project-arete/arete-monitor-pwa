@@ -3,7 +3,7 @@
 // app opens instantly (and offline shows the shell), while updates arrive on
 // the next load. Realm traffic is WebSocket and never touches this worker.
 
-const VERSION = 'arete-monitor-pwa-v3';
+const VERSION = 'arete-monitor-pwa-v4';
 const ASSETS = [
   './',
   './index.html',
@@ -24,7 +24,11 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(VERSION).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  e.waitUntil(
+    caches.open(VERSION)
+      .then((c) => c.addAll(ASSETS.map((u) => new Request(u, { cache: 'reload' }))))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', (e) => {
@@ -40,7 +44,7 @@ self.addEventListener('fetch', (e) => {
   if (url.origin !== location.origin) return; // registry fetches etc. go direct
   e.respondWith(
     caches.match(e.request).then((cached) => {
-      const fresh = fetch(e.request)
+      const fresh = fetch(e.request, { cache: 'no-cache' })
         .then((res) => {
           if (res.ok) caches.open(VERSION).then((c) => c.put(e.request, res.clone()));
           return res;

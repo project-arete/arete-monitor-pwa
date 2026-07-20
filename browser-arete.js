@@ -319,7 +319,17 @@
   // --------------------------------------------------------- service worker
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js').catch(() => {});
+      navigator.serviceWorker.register('sw.js')
+        .then((reg) => { try { reg.update(); } catch (_) {} })
+        .catch(() => {});
+    });
+    // When an updated worker activates, reload once so the new version shows
+    // immediately (guarded so it can never loop).
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (reloaded) return;
+      reloaded = true;
+      if (navigator.serviceWorker.controller) location.reload();
     });
   }
 })();
