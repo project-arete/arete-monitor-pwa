@@ -92,3 +92,25 @@
   .mv .crumb-lnk { font-size: 15px; }
   .mv .go-config { font-size: inherit; }
 }
+
+/* ---- tab bar: no hidden tabs on phones -----------------------------------
+   Horizontal scrolling hid tabs past the right edge. Wrap into rows instead:
+   all six sections always visible, each a comfortable touch target. */
+@media (max-width: 760px) {
+  .tabs {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    white-space: normal;
+    padding: 8px 10px 6px;
+    gap: 4px;
+  }
+  .tab {
+    flex: 1 1 30%;
+    text-align: center;
+    padding: 10px 4px;
+    border-radius: 8px;
+  }
+  /* guard against any wide content (tables, long ids) panning the page */
+  main { overflow-x: hidden; }
+  .mv table.props { display: block; overflow-x: auto; }
+}
