@@ -43,3 +43,52 @@
   .topbar { padding-top: calc(10px + env(safe-area-inset-top)); }
   main { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
 }
+
+/* ---- phone type scale ----------------------------------------------------
+   The desktop stylesheets use 9–14px information-density type. On a phone
+   that reads as tiny, so scale the known classes up (~+15–25%). */
+@media (max-width: 760px) {
+  body { font-size: 16px; }
+
+  .brand h1 { font-size: 18px; }
+  .subtitle { font-size: 13px; }
+  .realm-lbl { font-size: 11px; }
+  .realm-host { font-size: 15px; }
+  .state-pill { font-size: 13px; }
+
+  .card h2 { font-size: 15px; }
+  label { font-size: 14px; }
+  .status-grid dt { font-size: 14px; }
+  .status-grid dd { font-size: 15px; }
+  .mono { font-size: 13px; }
+  .log { font-size: 13px; }
+  .muted-note { font-size: 13px; }
+
+  .rstat-n { font-size: 30px; }
+  .rstat-l { font-size: 13px; }
+
+  .mv .note { font-size: 14px; }
+  .mv .tile .v { font-size: 28px; }
+  .mv .tile .l { font-size: 13px; }
+  .mv .group-head .cp { font-size: 15px; }
+  .mv .group-head .title { font-size: 13.5px; }
+  .mv .group-head .count { font-size: 13.5px; }
+  .mv .pty-sys { font-size: 15px; }
+  .mv .pty-node { font-size: 13.5px; }
+  .mv .pty-role { font-size: 11px; }
+  .mv .ctx-tag { font-size: 11px; }
+  .mv .ctx-name { font-size: 14px; }
+  .mv .cmeta { font-size: 13px; }
+  .mv .chip { font-size: 13px; padding: 4px 11px; }
+  .mv table.props th { font-size: 12px; }
+  .mv table.props td { font-size: 14.5px; padding: 10px 12px; }
+  .mv .pname { font-size: 14px; }
+  .mv .pdesc { font-size: 13px; }
+  .mv .fl { font-size: 15px; }
+  .mv .foot-note { font-size: 13px; }
+  .mv .sys-card .sname { font-size: 16px; }
+  .mv .sys-card .sid { font-size: 12px; }
+  .mv .sys-card .scounts { font-size: 13.5px; gap: 14px; }
+  .mv .crumb-lnk { font-size: 15px; }
+  .mv .go-config { font-size: inherit; }
+}
