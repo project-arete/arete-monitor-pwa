@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' ws: wss: https://cp.padi.io; img-src 'self' data:; manifest-src 'self';" />
+    <meta name="theme-color" content="#0e1726" />
+    <title>Arete Monitor</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icon-192.png" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="monitor.css" />
+    <link rel="stylesheet" href="mobile.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <img class="logo" src="logo.png" alt="Arete" />
+        <div>
+          <h1>Arete Monitor</h1>
+          <p class="subtitle">CNS/CP realm monitoring · <span id="coreVersion" title="Monitor release version"></span><span id="uiVersion" title="internal UI build stamp"> · PWA v1</span></p>
+        </div>
+      </div>
+      <div class="realm-ind" id="realmInd" hidden>
+        <span class="realm-lbl">realm</span>
+        <span class="realm-host" id="realmHost"></span>
+      </div>
+      <div class="state-right">
+        <span class="dot" id="statusDot" data-state="disconnected"></span>
+        <div class="state-pill" id="statePill">disconnected</div>
+      </div>
+    </header>
+
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button class="tab active" id="tab-monitor" data-panel="panel-monitor"
+              role="tab" aria-selected="true" aria-controls="panel-monitor">Home</button>
+      <button class="tab" id="tab-contexts" data-panel="panel-contexts"
+              role="tab" aria-selected="false" aria-controls="panel-contexts">Contexts</button>
+      <button class="tab" id="tab-connections" data-panel="panel-connections"
+              role="tab" aria-selected="false" aria-controls="panel-connections">Connections</button>
+      <button class="tab" id="tab-graph" data-panel="panel-graph"
+              role="tab" aria-selected="false" aria-controls="panel-graph">Graph</button>
+      <button class="tab" id="tab-status" data-panel="panel-status"
+              role="tab" aria-selected="false" aria-controls="panel-status">
+        Status<span class="tab-badge" id="statusBadge" hidden></span>
+      </button>
+      <button class="tab" id="tab-home" data-panel="panel-home"
+              role="tab" aria-selected="false" aria-controls="panel-home">Config</button>
+    </nav>
+
+    <main>
+      <!-- ============================ CONFIG ============================ -->
+      <div class="panel" id="panel-home" role="tabpanel" aria-labelledby="tab-home" hidden>
+        <section class="card">
+          <h2>Connection</h2>
+          <form id="connectForm" class="grid">
+            <label>Protocol
+              <select id="protocol">
+                <option value="wss:">wss:</option>
+                <option value="ws:">ws:</option>
+              </select>
+            </label>
+            <label>Host <small>(▾ shows past hosts)</small>
+              <input id="host" type="text" placeholder="realm host, e.g. my.aretehosting.com" autocomplete="off" list="hostList" />
+              <datalist id="hostList"></datalist>
+            </label>
+            <label>Port
+              <input id="port" type="number" value="443" min="1" max="65535" />
+            </label>
+            <label>Username <small>(browsers may not send credentials — open realms work best)</small>
+              <input id="username" type="text" autocomplete="off" />
+            </label>
+            <label>Password
+              <input id="password" type="password" autocomplete="off" />
+            </label>
+            <label>Monitor name <small>(used if you register this monitor)</small>
+              <input id="monitorName" type="text" placeholder="Arete Monitor" autocomplete="off" />
+            </label>
+            <label class="checkbox">
+              <input id="allowSelfSigned" type="checkbox" disabled />
+              <span>Allow self-signed TLS <small>(not possible in a browser — the realm needs a valid certificate)</small></span>
+            </label>
+            <label class="checkbox">
+              <input id="rememberPassword" type="checkbox" />
+              <span>Remember password <small>(stored in this browser)</small></span>
+            </label>
+            <label class="checkbox">
+              <input id="autoConnect" type="checkbox" />
+              <span>Connect automatically on launch</span>
+            </label>
+
+            <div class="actions">
+              <button type="submit" id="connectBtn" class="primary">Connect</button>
+              <button type="button" id="disconnectBtn" disabled>Disconnect</button>
+              <button type="button" id="registerBtn" disabled title="Registers System → Node → Context (requires a realm that accepts writes)">Register node &amp; context</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="card">
+          <h2>Preferences</h2>
+          <label class="checkbox">
+            <input id="themeLight" type="checkbox" />
+            <span>Light mode</span>
+          </label>
+        </section>
+      </div>
+
+      <!-- =========================== STATUS =========================== -->
+      <div class="panel" id="panel-status" role="tabpanel" aria-labelledby="tab-status" hidden>
+        <section class="card">
+          <div class="card-head">
+            <h2>Realm size</h2>
+            <span class="muted-note" id="realmSizeNote">not connected</span>
+          </div>
+          <div class="realm-stats">
+            <div class="rstat"><div class="rstat-n" id="rc-systems">—</div><div class="rstat-l">Systems</div></div>
+            <div class="rstat"><div class="rstat-n" id="rc-nodes">—</div><div class="rstat-l">Nodes</div></div>
+            <div class="rstat"><div class="rstat-n" id="rc-contexts">—</div><div class="rstat-l">Contexts</div></div>
+            <div class="rstat"><div class="rstat-n" id="rc-connections">—</div><div class="rstat-l">Connections</div></div>
+          </div>
+          <div class="realm-substats muted-note" id="realmSubStats"></div>
+        </section>
+
+        <section class="card">
+          <h2>Status</h2>
+          <dl class="status-grid">
+            <dt>State</dt><dd id="s-state">—</dd>
+            <dt>Channel open</dt><dd id="s-open">—</dd>
+            <dt>CNS version</dt><dd id="s-version">—</dd>
+            <dt>System ID</dt><dd id="s-system" class="mono">—</dd>
+            <dt>Node</dt><dd id="s-node" class="mono">—</dd>
+            <dt>Context</dt><dd id="s-context" class="mono">—</dd>
+            <dt>Last error</dt><dd id="s-error">—</dd>
+          </dl>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h2>Event log</h2>
+            <button type="button" id="clearLogBtn" class="ghost">Clear</button>
+          </div>
+          <div id="log" class="log" role="log" aria-live="polite"></div>
+        </section>
+      </div>
+
+      <!-- =========================== MONITOR =========================== -->
+      <div class="panel" id="panel-monitor" role="tabpanel" aria-labelledby="tab-monitor">
+        <div id="monitor-root" class="mv"></div>
+      </div>
+
+      <!-- ========================= CONNECTIONS ========================= -->
+      <div class="panel" id="panel-connections" role="tabpanel" aria-labelledby="tab-connections" hidden>
+        <div id="connections-root" class="mv"></div>
+      </div>
+
+      <!-- ========================== CONTEXTS =========================== -->
+      <div class="panel" id="panel-contexts" role="tabpanel" aria-labelledby="tab-contexts" hidden>
+        <div id="contexts-root" class="mv"></div>
+      </div>
+
+      <!-- ============================ GRAPH ============================ -->
+      <div class="panel" id="panel-graph" role="tabpanel" aria-labelledby="tab-graph" hidden>
+        <div id="graph-root" class="mv"></div>
+      </div>
+    </main>
+
+    <script src="browser-arete.js"></script>
+    <script src="renderer.js"></script>
+    <script src="arete-model.js"></script>
+    <script src="monitor.js"></script>
+    <script src="connections.js"></script>
+    <script src="contexts.js"></script>
+    <script src="graph.js"></script>
+  </body>
+</html>

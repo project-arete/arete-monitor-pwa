@@ -1,0 +1,45 @@
+/* mobile.css — PWA-only responsive overlay. The desktop styles.css/monitor.css
+   are UNCHANGED copies from the Electron app; everything phone-shaped
+   lives here so the two codebases stay easy to diff. */
+
+@media (max-width: 760px) {
+  .topbar { flex-wrap: wrap; gap: 8px 12px; padding: 10px 14px; }
+  .topbar h1 { font-size: 1.05rem; }
+  .topbar .subtitle { font-size: .7rem; }
+  /* the desktop centers this absolutely — on phones it becomes a normal row */
+  .realm-ind {
+    position: static; transform: none;
+    order: 3; width: 100%; max-width: 100%;
+    justify-content: flex-start;
+  }
+
+  .tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { flex: 0 0 auto; padding: 10px 14px; }
+
+  main { padding: 12px; }
+  .card { padding: 14px; }
+
+  /* connection form collapses to one column */
+  form.grid { grid-template-columns: 1fr !important; }
+  form.grid .actions { flex-wrap: wrap; }
+
+  .realm-stats { flex-wrap: wrap; gap: 10px; }
+  .rstat { min-width: 40%; }
+
+  /* comfortable touch targets */
+  button, .tab { min-height: 42px; }
+  input, select { min-height: 40px; font-size: 16px; } /* 16px stops iOS zoom-on-focus */
+}
+
+/* iOS safe areas (notch / home indicator) in standalone mode */
+@supports (padding: env(safe-area-inset-top)) {
+  .topbar { padding-top: calc(10px + env(safe-area-inset-top)); }
+  main { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "Arete Monitor",
+  "short_name": "Arete",
+  "description": "Live monitoring for CNS/CP realms — systems, contexts, connections, and a realm graph.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0e1726",
+  "theme_color": "#0e1726",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
