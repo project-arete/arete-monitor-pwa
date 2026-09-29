@@ -198,10 +198,11 @@
         protocol: s.protocol || 'wss:',
         host: urlHost || s.host || '',
         port: s.port || 443,
-        username: s.username || '',
-        password: s.rememberPassword ? (s.password || '') : '',
+        // A browser cannot send credentials on a WebSocket, so none are kept.
+        username: '',
+        password: '',
         allowSelfSigned: false,
-        rememberPassword: !!s.rememberPassword,
+        rememberPassword: false,
         autoConnect: !!s.autoConnect,
         identity: identity(),
         appVersion: 'PWA',
@@ -210,7 +211,7 @@
 
     async getSettings() {
       const s = readSettings();
-      return { monitorName: s.monitorName || 'Arete Monitor', theme: s.theme || 'dark', hosts: s.hosts || [] };
+      return { monitorName: s.monitorName || 'Arete Monitor', theme: s.theme || 'dark', hosts: (s.hosts || []).map((h) => ({ ...h, username: '' })) };
     },
     async saveSettings(patch) { return writeSettings(patch || {}); },
 
@@ -262,15 +263,16 @@
       setState('connected');
       log('info', 'Connected. Observing the realm (nothing registered).');
 
-      // Remember this host (never the password unless asked).
+      // Remember this host (never credentials: a browser cannot send them).
       const s = readSettings();
       const hosts = (s.hosts || []).filter((h) => h.host !== host);
-      hosts.unshift({ host, protocol, port, username, allowSelfSigned: false });
+      hosts.unshift({ host, protocol, port, username: '', allowSelfSigned: false });
       writeSettings({
-        host, protocol, port, username,
+        host, protocol, port, username: '',
         hosts: hosts.slice(0, 8),
         monitorName: (systemName || '').trim() || s.monitorName || 'Arete Monitor',
-        password: s.rememberPassword ? password : undefined,
+        password: '',
+        rememberPassword: false,
       });
       return getStatus();
     },

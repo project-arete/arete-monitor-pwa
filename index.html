@@ -22,7 +22,7 @@
         <img class="logo" src="logo.png" alt="Arete" />
         <div>
           <h1>Arete Monitor</h1>
-          <p class="subtitle">CNS/CP realm monitoring · <span id="coreVersion" title="Monitor release version"></span><span id="uiVersion" title="internal UI build stamp"> · PWA v5</span></p>
+          <p class="subtitle">CNS/CP realm monitoring · <span id="coreVersion" title="Monitor release version"></span><span id="uiVersion" title="internal UI build stamp"> · PWA v6</span></p>
         </div>
       </div>
       <div class="realm-ind" id="realmInd" hidden>
@@ -71,11 +71,11 @@
             <label>Port
               <input id="port" type="number" value="443" min="1" max="65535" />
             </label>
-            <label>Username <small>(browsers may not send credentials — open realms work best)</small>
-              <input id="username" type="text" autocomplete="off" />
+            <label>Username <small>(not available in the browser — a browser cannot send credentials to a realm)</small>
+              <input id="username" type="text" autocomplete="off" disabled />
             </label>
             <label>Password
-              <input id="password" type="password" autocomplete="off" />
+              <input id="password" type="password" autocomplete="off" disabled />
             </label>
             <label>Monitor name <small>(used if you register this monitor)</small>
               <input id="monitorName" type="text" placeholder="Arete Monitor" autocomplete="off" />
@@ -85,8 +85,8 @@
               <span>Allow self-signed TLS <small>(not possible in a browser — the realm needs a valid certificate)</small></span>
             </label>
             <label class="checkbox">
-              <input id="rememberPassword" type="checkbox" />
-              <span>Remember password <small>(stored in this browser)</small></span>
+              <input id="rememberPassword" type="checkbox" disabled />
+              <span>Remember password <small>(not available in the browser)</small></span>
             </label>
             <label class="checkbox">
               <input id="autoConnect" type="checkbox" />
