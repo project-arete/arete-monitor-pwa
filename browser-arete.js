@@ -155,7 +155,15 @@
   let currentHost = '';
   let registered = { system: null, node: null, context: null };
   let keysTimer = null;
-  const profileCache = new Map();
+  // CP Registry lookup. The shared resolver (cp-resolver.js, a stamped verbatim
+  // copy) reads cp.cnscp.io; contracts are held for good, and an outage is never
+  // held as an answer. The renderer passes the version the realm recorded on the
+  // capability; with none, the highest published, non-Deprecated version (what
+  // cns-cli records at Declare). The answer is { ok: true, profile } or
+  // { ok: false, kind }, kind being one of 'not registered', 'nothing published',
+  // 'no such version', 'deprecated', 'registry unavailable'.
+  const CPR = globalThis.CPResolver;
+  const resolver = CPR.createResolver({});
 
   const log = (level, message) => bus.emit('log', { level, message, ts: Date.now() });
   function setState(s) { state = s; bus.emit('status', getStatus()); }
@@ -281,15 +289,19 @@
     async getStatus() { return getStatus(); },
     async getKeys() { return getKeys(); },
 
-    async getProfile(name) {
-      if (!name) return null;
-      if (profileCache.has(name)) return profileCache.get(name);
+    async getProfile(name, version) {
+      if (!name) return { ok: false, kind: CPR.UNREGISTERED, name };
       try {
-        const res = await fetch('https://cp.padi.io/profiles/' + encodeURIComponent(name), { headers: { accept: 'application/json' } });
-        const json = res.ok ? await res.json() : null;
-        profileCache.set(name, json);
-        return json;
-      } catch (_) { profileCache.set(name, null); return null; }
+        let v = version;
+        if (v === undefined || v === null || String(v) === '') {
+          const cur = await resolver.current(name);
+          if (cur.version === null) return { ok: false, kind: cur.reason, name };
+          v = cur.version;
+        }
+        return { ok: true, profile: await resolver.contract(name, v) };
+      } catch (e) {
+        return { ok: false, kind: (e && e.kind) || CPR.UNAVAILABLE, name, version, message: e && e.message };
+      }
     },
 
     // Explicit opt-in registration (System -> Node -> Context), same commands

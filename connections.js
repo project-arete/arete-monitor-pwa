@@ -5,7 +5,7 @@
 (function () {
   const root = document.getElementById('connections-root');
   if (!root || !window.AreteModel) return;
-  const { esc, parseKeys, getKeys, propTable, regFor, ensureProfile, onChange } = window.AreteModel;
+  const { esc, parseKeys, getKeys, propTable, regFor, ensureProfile, onChange, whyNot, verLabel } = window.AreteModel;
 
   const state = { expanded: new Set() };
   let prevVals = {};
@@ -36,14 +36,18 @@
 
   function panelsHtml(model, hot) {
     const byCp = {};
-    model.connections.forEach((c) => (byCp[c.profile] || (byCp[c.profile] = { conns: [], unbound: [] })).conns.push(c));
-    model.unbound.forEach((u) => (byCp[u.profile] || (byCp[u.profile] = { conns: [], unbound: [] })).unbound.push(u));
+    // One panel per Profile AND recorded version: two capabilities of one Profile
+    // at different versions are different contracts and never share a panel.
+    const gk = (x) => x.profile + '\u0000' + (x.version || '');
+    model.connections.forEach((c) => (byCp[gk(c)] || (byCp[gk(c)] = { profile: c.profile, version: c.version, conns: [], unbound: [] })).conns.push(c));
+    model.unbound.forEach((u) => (byCp[gk(u)] || (byCp[gk(u)] = { profile: u.profile, version: u.version, conns: [], unbound: [] })).unbound.push(u));
 
-    return Object.keys(byCp).sort().map((profile) => {
-      const g = byCp[profile];
-      const reg = regFor(profile);
-      if (reg === undefined) ensureProfile(profile);
-      const title = reg ? esc(reg.title || '') : (reg === null ? 'not in registry' : '');
+    return Object.keys(byCp).sort().map((gkey) => {
+      const g = byCp[gkey];
+      const profile = g.profile;
+      const reg = regFor(profile, g.version);
+      if (reg === undefined) ensureProfile(profile, g.version);
+      const title = reg ? (reg.ok ? esc(reg.title || '') : esc(whyNot(reg))) : '';
 
       const conns = g.conns.map((c) => {
         const n = Object.keys(c.props).length;
@@ -57,7 +61,7 @@
             ${party(c.consumer, 'consumer')}
             <div class="chev">▶</div>
           </div>
-          <div class="details">${propTable(c.profile, c.props, c.id, prevVals)}</div>
+          <div class="details">${propTable(c.profile, c.props, c.id, prevVals, c.version)}</div>
         </div>`;
       }).join('');
 
@@ -73,12 +77,12 @@
             ${u.role === 'consumer' ? party(u.at, 'consumer') : party(null, 'consumer')}
             <div class="chev">▶</div>
           </div>
-          <div class="details">${propTable(u.profile, u.props, null, prevVals)}</div>
+          <div class="details">${propTable(u.profile, u.props, null, prevVals, u.version)}</div>
         </div>`;
       }).join('');
 
       const cnt = g.conns.length + g.unbound.length;
-      return `<div class="group"><div class="group-head"><span class="cp">${esc(profile)}</span>
+      return `<div class="group"><div class="group-head"><span class="cp">${esc(profile)}</span> ${verLabel(profile, g.version)}
         <span class="title">${title}</span><span class="count">${cnt} ${cnt === 1 ? 'entry' : 'entries'}</span></div>
         <div class="conns">${conns}${ub}</div></div>`;
     }).join('');

@@ -9,7 +9,7 @@
 (function () {
   const root = document.getElementById('monitor-root');
   if (!root || !window.AreteModel) return;
-  const { esc, parseKeys, getKeys, onChange, propTable } = window.AreteModel;
+  const { esc, parseKeys, getKeys, onChange, propTable, verLabel } = window.AreteModel;
 
   // view = {kind:'realm'} | {kind:'system',sysId} | {kind:'node',sysId,nodeId} | {kind:'context',sysId,ctxId}
   let view = { kind: 'realm' };
@@ -46,7 +46,7 @@
       if (!C) continue;
       const connIds = Object.keys(cap.conns);
       const peers = connIds.map((id) => cap.conns[id].peer).filter(Boolean).map((path) => model.label(path));
-      C.caps.push({ ck, profile: cap.profile, role: cap.role, props: cap.props, nProps: Object.keys(cap.props).length, bound: connIds.length > 0, connIds, peers });
+      C.caps.push({ ck, profile: cap.profile, version: cap.version, role: cap.role, props: cap.props, nProps: Object.keys(cap.props).length, bound: connIds.length > 0, connIds, peers });
     }
     const connCount = {};
     model.connections.forEach((c) => {
@@ -94,11 +94,11 @@
     return `<div class="cap-wrap">
       <div class="cap-row ${open ? 'open' : ''}" data-ck="${esc(cap.ck)}">
         <span class="cap-chev">${open ? '▾' : '▸'}</span>
-        <span class="cap-prof">${esc(cap.profile)}</span>
+        <span class="cap-prof">${esc(cap.profile)}</span> ${verLabel(cap.profile, cap.version)}
         <span class="cap-role ${roleCls}">${cap.role}</span>
         <span class="cap-meta">${cap.nProps} prop${cap.nProps === 1 ? '' : 's'} · ${cap.bound ? '⇄ ' : ''}${peers}</span>
       </div>
-      ${open ? `<div class="cap-details">${propTable(cap.profile, cap.props, null, {})}</div>` : ''}
+      ${open ? `<div class="cap-details">${propTable(cap.profile, cap.props, null, {}, cap.version)}</div>` : ''}
     </div>`;
   }
 

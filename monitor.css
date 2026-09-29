@@ -76,6 +76,10 @@ body.light .mv { --panel-3:#e2e6ec; --faint:#8b95a3; --accent-soft:rgba(42,120,2
 .mv table.props tr:last-child td{border-bottom:none;}
 .mv .pname{font-family:var(--mono);font-size:12.5px;}
 .mv .pdesc{font-size:11.5px;color:var(--muted);margin-top:2px;}
+.mv .pmeta{font-size:11.5px;color:var(--muted);padding:6px 12px 2px;}
+.mv .pmeta.warn{color:var(--warn,#d9a441);}
+.mv .pver{font-size:10.5px;color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:0 6px;margin-left:4px;}
+.mv .badge.dep{font-size:10px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;color:#c98a1b;border:1px solid #c98a1b;border-radius:8px;padding:0 6px;margin-left:4px;}
 /* data-flow arrows in the property table: ──▶ provider→consumer, ◀── consumer→provider */
 .mv .fl{font-size:13px;letter-spacing:-1px;white-space:nowrap;cursor:default;}
 .mv .fl.prov{color:var(--role-prov);} .mv .fl.cons{color:var(--role-cons);} .mv .fl.unk{color:var(--faint);}

@@ -7,7 +7,7 @@
 (function () {
   const root = document.getElementById('contexts-root');
   if (!root || !window.AreteModel) return;
-  const { esc, parseKeys, getKeys, onChange, propTable } = window.AreteModel;
+  const { esc, parseKeys, getKeys, onChange, propTable, verLabel } = window.AreteModel;
 
   // view = {kind:'list'} | {kind:'ctx', ctxId}
   let view = { kind: 'list' };
@@ -46,7 +46,7 @@
       if (!connIds.length) A.unbound++;
       A.profiles.add(cap.profile);
       A.caps.push({
-        ck, profile: cap.profile, role: cap.role, props: cap.props,
+        ck, profile: cap.profile, version: cap.version, role: cap.role, props: cap.props,
         nProps: Object.keys(cap.props).length, bound: connIds.length > 0,
         at: model.label(cap.ctxPath),
         peers: connIds.map((i) => cap.conns[i].peer).filter(Boolean).map((path) => model.label(path)),
@@ -113,13 +113,13 @@
       <div class="crow">
         ${party(c.provider, 'provider')}
         <div class="cmid">
-          <div class="ctx-wrap"><span class="ctx-tag">cp</span><span class="ctx-name">${esc(c.profile)}</span></div>
+          <div class="ctx-wrap"><span class="ctx-tag">cp</span><span class="ctx-name">${esc(c.profile)}</span> ${verLabel(c.profile, c.version)}</div>
           <div class="cmeta"><span class="chip bound"><span class="c-dot"></span>Bound</span> · ${n} propert${n === 1 ? 'y' : 'ies'}</div>
         </div>
         ${party(c.consumer, 'consumer')}
         <div class="chev">▶</div>
       </div>
-      <div class="details">${propTable(c.profile, c.props, null, {})}</div>
+      <div class="details">${propTable(c.profile, c.props, null, {}, c.version)}</div>
     </div>`;
   }
 
@@ -133,11 +133,11 @@
     return `<div class="cap-wrap">
       <div class="cap-row ${open ? 'open' : ''}" data-x="${esc(key)}">
         <span class="cap-chev">${open ? '▾' : '▸'}</span>
-        <span class="cap-prof">${esc(cap.profile)}</span>
+        <span class="cap-prof">${esc(cap.profile)}</span> ${verLabel(cap.profile, cap.version)}
         <span class="cap-role ${roleCls}">${cap.role}</span>
         <span class="cap-meta">${cap.nProps} prop${cap.nProps === 1 ? '' : 's'} · ${cap.bound ? '⇄ ' : ''}${peers}</span>
       </div>
-      ${open ? `<div class="cap-details">${propTable(cap.profile, cap.props, null, {})}</div>` : ''}
+      ${open ? `<div class="cap-details">${propTable(cap.profile, cap.props, null, {}, cap.version)}</div>` : ''}
     </div>`;
   }
 

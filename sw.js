@@ -3,13 +3,14 @@
 // app opens instantly (and offline shows the shell), while updates arrive on
 // the next load. Realm traffic is WebSocket and never touches this worker.
 
-const VERSION = 'arete-monitor-pwa-v4';
+const VERSION = 'arete-monitor-pwa-v5';
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
   './monitor.css',
   './mobile.css',
+  './cp-resolver.js',
   './browser-arete.js',
   './renderer.js',
   './arete-model.js',
